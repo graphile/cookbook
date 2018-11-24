@@ -1,0 +1,13 @@
+{
+  "name": "small-examples",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": ["examples/*"],
+  "description": "Small examples for PostGraphile",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT"
+}
