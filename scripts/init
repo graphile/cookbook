@@ -1,0 +1,135 @@
+#!/usr/bin/env node
+const pg = require("pg");
+const fs = require("fs");
+const child_process = require("child_process");
+
+const EXAMPLES_DIR = `${__dirname}/../examples`;
+const PG_BASE_CONNECTION_STRING =
+  process.env.TEST_DATABASE_BASE_URL || "postgres://localhost";
+
+async function main(pgPool) {
+  const examples = fs.readdirSync(EXAMPLES_DIR).filter(d => d[0] !== ".");
+
+  // Initialise all examples in a single transaction
+  await withTransaction(pgPool, async pgClient => {
+    for (const dir of examples) {
+      const path = `${EXAMPLES_DIR}/${dir}`;
+      const initScriptPath = `${path}/db/init.sql`;
+      if (fs.existsSync(initScriptPath)) {
+        console.log(`# ${initScriptPath}`);
+        await pgClient.query(fs.readFileSync(initScriptPath, "utf8"));
+      }
+    }
+  });
+
+  // Where appropriate, perform the before/after actions
+  for (const dir of examples) {
+    const path = `${EXAMPLES_DIR}/${dir}`;
+    const packageJson = require(`${path}/package.json`);
+    if (packageJson.scripts.before) {
+      await run(path, "yarn", ["before"]);
+    }
+
+    if (packageJson.scripts.after) {
+      const afterScriptPath = `${path}/db/after.sql`;
+      if (fs.existsSync(afterScriptPath)) {
+        console.log(`# ${afterScriptPath}`);
+        await withTransaction(pgPool, pgClient =>
+          pgClient.query(fs.readFileSync(afterScriptPath, "utf8"))
+        );
+      }
+      await run(path, "yarn", ["after"]);
+    }
+
+    const beforeSchemaPath = `${path}/data/before.graphql`;
+    const afterSchemaPath = `${path}/data/after.graphql`;
+    if (fs.existsSync(beforeSchemaPath) && fs.existsSync(afterSchemaPath)) {
+      const stdout = await run(
+        path,
+        "diff",
+        ["-rud", beforeSchemaPath, afterSchemaPath],
+        1
+      );
+      fs.writeFileSync(`${path}/data/graphql.diff`, stdout);
+    }
+  }
+}
+
+const filteredEnv = Object.entries(process.env)
+  .filter(([k, v]) => k === k.toUpperCase())
+  .reduce((memo, [k, v]) => {
+    memo[k] = v;
+    return memo;
+  }, {});
+
+async function run(cwd, binary, args, expectedExitStatus = 0) {
+  console.log(`! ${binary} '${args.join("'  '")}'`);
+  const cp = child_process.spawn(binary, args, {
+    cwd,
+    stdio: ["ignore", "pipe", "inherit"],
+    env: filteredEnv
+  });
+
+  return new Promise((resolve, reject) => {
+    let data = Buffer.alloc(0);
+    cp.stdout.on("data", newData => {
+      process.stdout.write(newData);
+      data = Buffer.concat([data, newData]);
+    });
+    cp.on("close", code => {
+      if (code !== expectedExitStatus) {
+        reject(
+          new Error(
+            `Command ${binary} exited with status ${code} (args: ${JSON.stringify(
+              args,
+              null,
+              2
+            )})`
+          )
+        );
+      }
+      resolve(data.toString("utf8"));
+    });
+  });
+}
+
+async function withTransaction(pgPool, fn) {
+  const pgClient = await pgPool.connect();
+  try {
+    await pgClient.query("begin");
+    return await fn(pgClient);
+  } finally {
+    await pgClient.query("commit");
+    await pgClient.release();
+  }
+}
+
+async function withReinitialisedDb(fn) {
+  // Create the DB if necessary
+  const rootPgPool = new pg.Pool({
+    connectionString: `${PG_BASE_CONNECTION_STRING}/postgres`
+  });
+  try {
+    try {
+      await rootPgPool.query("CREATE DATABASE graphile_small_examples;");
+    } catch (e) {
+      // Don't care
+    }
+  } finally {
+    await rootPgPool.end();
+  }
+
+  const pgPool = new pg.Pool({
+    connectionString: `${PG_BASE_CONNECTION_STRING}/graphile_small_examples`
+  });
+  try {
+    await fn(pgPool);
+  } finally {
+    await pgPool.end();
+  }
+}
+
+withReinitialisedDb(main).catch(e => {
+  console.error(e);
+  process.exitCode = 1;
+});

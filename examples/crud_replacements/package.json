@@ -1,0 +1,18 @@
+{
+  "name": "@graphile-examples/crud_replacements",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "local_postgraphile": "postgraphile -c graphile_small_examples -s crud_replacements --enhance-graphiql --dynamic-json",
+    "start": "yarn run local_postgraphile --watch",
+    "before": "yarn run local_postgraphile -X --export-schema-graphql data/before.graphql",
+    "after": "yarn run local_postgraphile -X --export-schema-graphql data/after.graphql",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "dependencies": {
+    "postgraphile": "^4.1.0-rc.3"
+  }
+}
