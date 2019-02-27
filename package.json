@@ -14,5 +14,8 @@
   "license": "MIT",
   "dependencies": {
     "pg": "^7.6.1"
+  },
+  "resolutions": {
+    "graphql": "14.x"
   }
 }

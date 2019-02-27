@@ -1,0 +1,48 @@
+--- data/before.graphql
++++ data/after.graphql
+@@ -140,6 +140,18 @@
+   ): DeletePersonPayload
+ }
+ 
++type MyCustomType {
++  name: String
++  avatarUrl: String
++  tags: [String!]!
++}
++
++input MyCustomTypeInput {
++  name: String
++  avatarUrl: String
++  tags: [String!]
++}
++
+ """An object with a globally unique `ID`."""
+ interface Node {
+   """
+@@ -211,7 +223,7 @@
+   nodeId: ID!
+   id: Int!
+   name: String!
+-  bio: JSON!
++  bio: MyCustomType
+   createdAt: Datetime!
+ }
+ 
+@@ -236,7 +248,7 @@
+ input PersonInput {
+   id: Int
+   name: String!
+-  bio: JSON
++  bio: MyCustomTypeInput
+   createdAt: Datetime
+ }
+ 
+@@ -246,7 +258,7 @@
+ input PersonPatch {
+   id: Int
+   name: String
+-  bio: JSON
++  bio: MyCustomTypeInput
+   createdAt: Datetime
+ }
+ 
