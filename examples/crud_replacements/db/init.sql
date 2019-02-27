@@ -8,5 +8,3 @@ create table my_table (
   description text,
   created_at timestamptz not null default now()
 );
-
--- \i replace-crud.sql

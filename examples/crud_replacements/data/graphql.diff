@@ -1,5 +1,5 @@
---- /Users/benjiegillam/Dev/small-examples/scripts/../examples/crud_replacements/data/before.graphql	2018-11-24 13:16:31.000000000 +0000
-+++ /Users/benjiegillam/Dev/small-examples/scripts/../examples/crud_replacements/data/after.graphql	2018-11-24 13:16:32.000000000 +0000
+--- /Users/benjiegillam/Dev/small-examples/scripts/../examples/crud_replacements/data/before.graphql	2019-02-27 10:16:07.000000000 +0000
++++ /Users/benjiegillam/Dev/small-examples/scripts/../examples/crud_replacements/data/after.graphql	2019-02-27 10:16:08.000000000 +0000
 @@ -1,24 +1,20 @@
 -"""All input for the create `MyTable` mutation."""
 +"""All input for the `createMyTable` mutation."""

@@ -1,3 +1,4 @@
+set search_path to crud_replacements, public;
 /*
  * What follows is how to replace the built in CRUD mutations for the my_table
  * table with functions. This is currently only an approximation, but hopefully
