@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const pg = require("pg");
 const fs = require("fs");
+const Path = require("path");
 const child_process = require("child_process");
 
 const EXAMPLES_DIR = `${__dirname}/../examples`;
@@ -47,7 +48,15 @@ async function main(pgPool) {
       const stdout = await run(
         path,
         "diff",
-        ["-rud", beforeSchemaPath, afterSchemaPath],
+        [
+          "-rud",
+          "-L",
+          Path.relative(path, beforeSchemaPath),
+          Path.relative(path, beforeSchemaPath),
+          "-L",
+          Path.relative(path, afterSchemaPath),
+          Path.relative(path, afterSchemaPath)
+        ],
         1
       );
       fs.writeFileSync(`${path}/data/graphql.diff`, stdout);
