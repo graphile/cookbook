@@ -1,7 +1,7 @@
 # Small Examples
 
-This repository is a monorepo collection of small examples to answer user questions
-and be reference for the documentation.
+This repository is a monorepo collection of small examples to answer user
+questions and be reference for the documentation.
 
 Each example should be self-contained in its own folder in `examples/` with
 its own README.
