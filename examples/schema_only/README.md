@@ -17,6 +17,12 @@ Install dependencies:
 yarn
 ```
 
+Change into this folder
+
+```bash
+cd examples/schema_only
+```
+
 Install the cookbook schema into locally running PostgreSQL (if you don't have locally running PostgreSQL, you'll need to edit this script; also it assumes that there's a `postgres` database that you have permission to, and that you're using trust authentication):
 
 ```bash
@@ -26,7 +32,6 @@ Install the cookbook schema into locally running PostgreSQL (if you don't have l
 Now run the example:
 
 ```bash
-cd examples/schema_only
 node main.js
 ```
 
