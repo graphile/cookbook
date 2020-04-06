@@ -17,5 +17,8 @@
   },
   "resolutions": {
     "graphql": "14.x"
+  },
+  "devDependencies": {
+    "prettier": "^2.0.3"
   }
 }

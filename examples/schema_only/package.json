@@ -1,0 +1,10 @@
+{
+  "name": "@graphile-examples/schema_only",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "graphql": "^15.0.0",
+    "pg": "^8.0.0",
+    "postgraphile": "^4.6.0"
+  }
+}
