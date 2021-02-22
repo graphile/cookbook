@@ -27,11 +27,11 @@ async function main(pgPool) {
   for (const dir of examples) {
     const path = `${EXAMPLES_DIR}/${dir}`;
     const packageJson = require(`${path}/package.json`);
-    if (packageJson.scripts.before) {
+    if (packageJson.scripts && packageJson.scripts.before) {
       await run(path, "yarn", ["before"]);
     }
 
-    if (packageJson.scripts.after) {
+    if (packageJson.scripts && packageJson.scripts.after) {
       const afterScriptPath = `${path}/db/after.sql`;
       if (fs.existsSync(afterScriptPath)) {
         console.log(`# ${afterScriptPath}`);
